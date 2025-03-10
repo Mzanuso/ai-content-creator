@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "AI Content Creator"
     
     # CORS settings
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "https://localhost:3000"]
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "https://localhost:3000", "https://ai-content-creator-video-content-creator-4bb16.web.app", "https://video-content-creator-4bb16.web.app"]
     
     # Firebase settings
     FIREBASE_PROJECT_ID: str = os.getenv("FIREBASE_PROJECT_ID", "video-content-creator-4bb16")
@@ -32,10 +32,16 @@ class Settings(BaseSettings):
     def firebase_credentials(self):
         """Get Firebase credentials from environment or file."""
         if self.FIREBASE_SERVICE_ACCOUNT_JSON:
-            return json.loads(self.FIREBASE_SERVICE_ACCOUNT_JSON)
+            try:
+                return json.loads(self.FIREBASE_SERVICE_ACCOUNT_JSON)
+            except json.JSONDecodeError:
+                return None
         elif self.FIREBASE_SERVICE_ACCOUNT_PATH and os.path.exists(self.FIREBASE_SERVICE_ACCOUNT_PATH):
-            with open(self.FIREBASE_SERVICE_ACCOUNT_PATH, 'r') as f:
-                return json.load(f)
+            try:
+                with open(self.FIREBASE_SERVICE_ACCOUNT_PATH, 'r') as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, IOError):
+                return None
         return None
     
     # OpenAI settings
@@ -59,4 +65,3 @@ class Settings(BaseSettings):
 
 # Create singleton instance
 settings = Settings()
-
