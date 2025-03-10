@@ -1,0 +1,12 @@
+env:
+  - variable: FIREBASE_CONFIG
+    value: '{"databaseURL":"","projectId":"video-content-creator-4bb16","storageBucket":"video-content-creator-4bb16.firebasestorage.app"}'
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_WEBAPP_CONFIG
+    value: '{"apiKey":"AIzaSyCT0BFTRljnsrbcT1SxwsWEEyrgca952cg","appId":"1:1050991356651:web:47b42676c06e732b6eecae","authDomain":"video-content-creator-4bb16.firebaseapp.com","databaseURL":"","messagingSenderId":"1050991356651","projectId":"video-content-creator-4bb16","storageBucket":"video-content-creator-4bb16.firebasestorage.app"}'
+    availability:
+      - BUILD
+
+app_root: frontend
