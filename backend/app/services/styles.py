@@ -83,125 +83,115 @@ class StyleService:
 
     @staticmethod
     async def get_style_categories() -> List[StyleCategory]:
-        """Get all unique style categories with counts."""
+        """Get all style categories with counts."""
         # Get all styles
         styles_data = FirebaseService.get_documents(COLLECTION_NAME)
         
-        # Group by category and count
-        categories_dict = {}
-        for style in styles_data:
-            category = style.get("category", "Uncategorized")
-            if category in categories_dict:
-                categories_dict[category]["count"] += 1
-            else:
-                categories_dict[category] = {
-                    "name": category,
-                    "count": 1,
-                    "description": ""  # Could be updated with actual descriptions if available
-                }
+        # Extract categories
+        categories = [style.get("category", "Uncategorized") for style in styles_data]
         
-        # Convert to list of StyleCategory objects
-        return [StyleCategory(**data) for data in categories_dict.values()]
-    
+        # Count styles per category
+        category_counts = {}
+        for category in categories:
+            if category in category_counts:
+                category_counts[category] += 1
+            else:
+                category_counts[category] = 1
+        
+        # Convert to StyleCategory objects
+        return [
+            StyleCategory(name=category, count=count)
+            for category, count in category_counts.items()
+        ]
+
     @staticmethod
     async def get_recommended_styles(limit: int = 10) -> List[Style]:
-        """Get recommended styles based on popularity or editorial selection."""
-        # This is a simplified implementation
-        # In a real app, you might want to implement more sophisticated recommendation logic
+        """Get recommended styles."""
+        # In a real implementation, this would use some algorithm
+        # to select recommended styles based on user preferences,
+        # popular styles, etc. For now, we'll just return the most
+        # recently added styles.
         styles_data = FirebaseService.get_documents(
             COLLECTION_NAME,
-            # Example: You could have a 'recommended' or 'featured' field in your styles
-            where_clauses=[("recommended", "==", True)],
+            order_by=[("createdAt", "desc")],
             limit=limit
         )
         
-        if not styles_data:
-            # Fallback to just returning some styles
-            styles_data = FirebaseService.get_documents(
-                COLLECTION_NAME,
-                limit=limit
-            )
-        
         return [Style(**style_data) for style_data in styles_data]
-    
+
     @staticmethod
-    async def search_styles_by_keywords(keywords: List[str], limit: int = 20) -> List[Style]:
+    async def search_styles_by_keyword(keyword: str, limit: int = 20) -> List[Style]:
         """
-        Search styles that match any of the given keywords.
-        Note: This is a simplified implementation that would work better with
-        a dedicated search service like Algolia.
+        Search styles by keyword.
+        Note: Due to limitations of Firestore, this implementation is simplified.
+        For full-text search, consider integrating Algolia or similar services.
         """
-        if not keywords:
-            return []
+        # Get all styles (in a real app, this should be paginated)
+        styles_data = FirebaseService.get_documents(
+            COLLECTION_NAME,
+            limit=100  # Limit to prevent loading too many documents
+        )
         
-        # Get all styles - in a real app with many styles, this would be inefficient
-        all_styles = await StyleService.list_styles(limit=1000)
+        # Filter by keyword (client-side)
+        keyword = keyword.lower()
+        filtered_styles = []
         
-        # Filter styles that match any keyword
-        keywords_lower = [k.lower() for k in keywords]
-        matched_styles = []
-        
-        for style in all_styles:
-            # Check if any of the style's keywords match the search keywords
-            style_keywords = [k.lower() for k in (style.recommendedKeywords or [])]
-            style_tags = [t.lower() for t in (style.tags or [])]
+        for style_data in styles_data:
+            # Check in name and description
+            if (keyword in style_data.get("name", "").lower() or 
+                keyword in style_data.get("description", "").lower()):
+                filtered_styles.append(style_data)
+                continue
             
-            if any(k in keywords_lower for k in style_keywords) or \
-               any(t in keywords_lower for t in style_tags) or \
-               any(k in style.name.lower() for k in keywords_lower) or \
-               (style.description and any(k in style.description.lower() for k in keywords_lower)):
-                matched_styles.append(style)
+            # Check in recommended keywords
+            if any(keyword in kw.lower() for kw in style_data.get("recommendedKeywords", [])):
+                filtered_styles.append(style_data)
+                continue
             
-            if len(matched_styles) >= limit:
-                break
+            # Check in tags
+            if any(keyword in tag.lower() for tag in style_data.get("tags", [])):
+                filtered_styles.append(style_data)
+                continue
         
-        return matched_styles
-    
+        # Limit results
+        filtered_styles = filtered_styles[:limit]
+        
+        # Convert to Style objects
+        return [Style(**style_data) for style_data in filtered_styles]
+
     @staticmethod
     async def import_style_from_analysis(
         sref_code: str,
-        analysis_data: Dict[str, Any],
-        preview_url: str
+        analysis_data: Dict[str, Any]
     ) -> Style:
         """
-        Import a style from an analysis file like the one shown in the example.
-        
-        Parameters:
-            sref_code: The reference code for the style (e.g., "sref_96616859_001")
-            analysis_data: The parsed content of the analysis file
-            preview_url: URL to the preview image for this style
-            
-        Returns:
-            The created Style object
+        Import a style from analysis data (e.g., from a JSON file).
+        This is useful for bulk importing styles.
         """
-        # Extract relevant data from the analysis
-        category = analysis_data.get("CATEGORY", "").replace("_", "/")
-        subcategory = analysis_data.get("SUBCATEGORY", "")
+        # Extract data from analysis
+        category = analysis_data.get("CATEGORY", "").strip()
+        subcategory = analysis_data.get("SUBCATEGORY", "").strip()
         
         # Extract keywords
         keywords = []
-        for i in range(1, 21):  # Keywords 1-20
+        for i in range(1, 21):  # Assuming keywords are numbered 1-20
             key = str(i)
             if key in analysis_data.get("KEYWORDS", {}):
-                keyword = analysis_data["KEYWORDS"][key]
-                if keyword and keyword.strip():
-                    keywords.append(keyword.strip())
+                kw = analysis_data["KEYWORDS"][key].strip()
+                if kw:  # Only add non-empty keywords
+                    keywords.append(kw)
         
-        # Extract color palette
-        color_palette = []
-        for i in range(26, 31):  # RGB values 26-30
+        # Extract RGB colors
+        rgb_colors = []
+        for i in range(25, 30):  # Assuming RGB colors are numbered 25-29
             key = str(i)
             if key in analysis_data.get("KEYWORDS", {}):
-                color_info = analysis_data["KEYWORDS"][key]
-                if color_info and "RGB(" in color_info:
-                    # Extract just the RGB value
-                    rgb_part = color_info.split(" - ")[0].strip()
-                    color_palette.append(rgb_part)
+                color = analysis_data["KEYWORDS"][key].strip()
+                if color.startswith("RGB"):
+                    rgb_colors.append(color)
         
-        # Extract social media caption
-        social_media = ""
-        if "23" in analysis_data.get("KEYWORDS", {}):
-            social_media = analysis_data["KEYWORDS"]["23"]
+        # Extract social media text
+        social_media = analysis_data.get("KEYWORDS", {}).get("23", "").strip()
         
         # Create style data
         style_data = StyleCreate(
@@ -210,9 +200,8 @@ class StyleService:
             description=analysis_data.get("CREATIVE_INTERPRETATION", ""),
             category=category,
             tags=[subcategory] + keywords[:10],  # Use top 10 keywords as tags
-            previewUrl=preview_url,
-            exampleUrls=[preview_url],
-            recommendedKeywords=keywords
+            recommendedKeywords=keywords,
+            exampleUrls=[]  # These would need to be added separately
         )
         
         # Create style
