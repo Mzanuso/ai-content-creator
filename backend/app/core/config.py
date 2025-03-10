@@ -23,10 +23,10 @@ class Settings(BaseSettings):
     FIREBASE_PROJECT_ID: str = os.getenv("FIREBASE_PROJECT_ID", "video-content-creator-4bb16")
     FIREBASE_SERVICE_ACCOUNT: str = os.getenv("FIREBASE_SERVICE_ACCOUNT", "")
     
-    # OpenAI settings - Set this from GOAPI_KEY.txt
+    # OpenAI settings - Prendi la chiave dall'ambiente
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     
-    # GoAPI settings - Set this from GOAPI_KEY.txt
+    # GoAPI settings - Prendi la chiave dall'ambiente 
     GOAPI_API_KEY: str = os.getenv("GOAPI_API_KEY", "")
     
     # Security settings
@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+
+
+# Create singleton instance
+settings = Settings()
+
 
 
 # Create singleton instance
