@@ -1,4 +1,5 @@
 import os
+import json
 from typing import List
 
 from pydantic_settings import BaseSettings
@@ -21,12 +22,26 @@ class Settings(BaseSettings):
     
     # Firebase settings
     FIREBASE_PROJECT_ID: str = os.getenv("FIREBASE_PROJECT_ID", "video-content-creator-4bb16")
-    FIREBASE_SERVICE_ACCOUNT: str = os.getenv("FIREBASE_SERVICE_ACCOUNT", "")
     
-    # OpenAI settings - Prendi la chiave dall'ambiente
+    # The service account can be provided as a JSON string in an environment variable
+    # or as a path to a file
+    FIREBASE_SERVICE_ACCOUNT_JSON: str = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "")
+    FIREBASE_SERVICE_ACCOUNT_PATH: str = os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH", "")
+    
+    @property
+    def firebase_credentials(self):
+        """Get Firebase credentials from environment or file."""
+        if self.FIREBASE_SERVICE_ACCOUNT_JSON:
+            return json.loads(self.FIREBASE_SERVICE_ACCOUNT_JSON)
+        elif self.FIREBASE_SERVICE_ACCOUNT_PATH and os.path.exists(self.FIREBASE_SERVICE_ACCOUNT_PATH):
+            with open(self.FIREBASE_SERVICE_ACCOUNT_PATH, 'r') as f:
+                return json.load(f)
+        return None
+    
+    # OpenAI settings
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     
-    # GoAPI settings - Prendi la chiave dall'ambiente 
+    # GoAPI settings
     GOAPI_API_KEY: str = os.getenv("GOAPI_API_KEY", "")
     
     # Security settings
@@ -45,7 +60,3 @@ class Settings(BaseSettings):
 # Create singleton instance
 settings = Settings()
 
-
-
-# Create singleton instance
-settings = Settings()
