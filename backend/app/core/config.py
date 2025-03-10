@@ -20,13 +20,13 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "https://localhost:3000"]
     
     # Firebase settings
-    FIREBASE_PROJECT_ID: str = os.getenv("FIREBASE_PROJECT_ID", "")
+    FIREBASE_PROJECT_ID: str = os.getenv("FIREBASE_PROJECT_ID", "video-content-creator-4bb16")
     FIREBASE_SERVICE_ACCOUNT: str = os.getenv("FIREBASE_SERVICE_ACCOUNT", "")
     
-    # OpenAI settings
+    # OpenAI settings - Set this from GOAPI_KEY.txt
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     
-    # GoAPI settings
+    # GoAPI settings - Set this from GOAPI_KEY.txt
     GOAPI_API_KEY: str = os.getenv("GOAPI_API_KEY", "")
     
     # Security settings
