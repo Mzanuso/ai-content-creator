@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cd frontend && npm install && npm run build",
+    "prepare-frontend": "cd frontend && npm install --legacy-peer-deps && npm run build",
+    "build": "npm run prepare-frontend",
     "deploy": "firebase deploy"
   },
   "repository": {
@@ -24,6 +25,10 @@
     "url": "https://github.com/Mzanuso/ai-content-creator/issues"
   },
   "homepage": "https://github.com/Mzanuso/ai-content-creator#readme",
+  "engines": {
+    "node": "16.x",
+    "npm": "8.x"
+  },
   "dependencies": {
     "firebase-tools": "^12.5.2"
   }
