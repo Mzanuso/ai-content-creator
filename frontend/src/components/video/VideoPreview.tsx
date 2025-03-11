@@ -31,6 +31,7 @@ import {
   Switch,
   FormControl,
   FormLabel,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { 
   FaPlay, 
@@ -44,13 +45,17 @@ import {
   FaShare, 
   FaChevronDown, 
   FaCheckCircle,
-  FaRandom
+  FaRandom,
+  FaFileExport,
+  FaShareAlt
 } from 'react-icons/fa';
+import ExportDialog from '../export/ExportDialog';
 
 // Props for the VideoPreview component
 interface VideoPreviewProps {
   videoUrl: string;
   onExport?: (options: ExportOptions) => void;
+  projectId?: string;
 }
 
 // Export options interface
@@ -62,25 +67,21 @@ interface ExportOptions {
 }
 
 // Main VideoPreview component
-const VideoPreview: React.FC<VideoPreviewProps> = ({ videoUrl, onExport }) => {
+const VideoPreview: React.FC<VideoPreviewProps> = ({ videoUrl, onExport, projectId = 'default-project' }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [exportOptions, setExportOptions] = useState<ExportOptions>({
-    format: 'mp4',
-    quality: 'high',
-    resolution: '1080p',
-    includeAudio: true,
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [exportComplete, setExportComplete] = useState(false);
+  const [showVolumeTooltip, setShowVolumeTooltip] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const toast = useToast();
+  
+  // Export dialog state
+  const { isOpen, onOpen, onClose } = useDisclosure();
   
   // Initialize video
   useEffect(() => {
@@ -188,40 +189,9 @@ const VideoPreview: React.FC<VideoPreviewProps> = ({ videoUrl, onExport }) => {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
   
-  // Handle export options change
-  const handleExportOptionChange = (option: keyof ExportOptions, value: any) => {
-    setExportOptions(prev => ({
-      ...prev,
-      [option]: value
-    }));
-  };
-  
-  // Handle export button click
-  const handleExport = () => {
-    setIsLoading(true);
-    
-    // Simulate export process
-    setTimeout(() => {
-      setIsLoading(false);
-      setExportComplete(true);
-      
-      toast({
-        title: "Export Complete",
-        description: `Your video has been exported as ${exportOptions.resolution} ${exportOptions.format.toUpperCase()}.`,
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-      
-      if (onExport) {
-        onExport(exportOptions);
-      }
-      
-      // Reset export complete status after a delay
-      setTimeout(() => {
-        setExportComplete(false);
-      }, 3000);
-    }, 3000);
+  // Open export dialog
+  const handleOpenExportDialog = () => {
+    onOpen();
   };
   
   return (
@@ -342,106 +312,57 @@ const VideoPreview: React.FC<VideoPreviewProps> = ({ videoUrl, onExport }) => {
         </Flex>
       </Box>
       
-      {/* Export options */}
+      {/* Export and share actions */}
       <Box bg="gray.700" p={6} borderRadius="md">
-        <Flex justifyContent="space-between" alignItems="center" mb={6}>
-          <Heading size="sm">Export Settings</Heading>
-          <Button
-            leftIcon={exportComplete ? <FaCheckCircle /> : <FaDownload />}
-            colorScheme={exportComplete ? "green" : "brand"}
-            isLoading={isLoading}
-            loadingText="Exporting..."
-            onClick={handleExport}
-          >
-            {exportComplete ? "Exported" : "Export Video"}
-          </Button>
-        </Flex>
-        
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-          <FormControl>
-            <FormLabel>Format</FormLabel>
-            <Select
-              value={exportOptions.format}
-              onChange={(e) => handleExportOptionChange('format', e.target.value)}
-              bg="gray.600"
+        <HStack spacing={8} justifyContent="space-between">
+          <VStack align="start" spacing={1}>
+            <Heading size="sm">Ready to Share</Heading>
+            <Text fontSize="sm" color="gray.400">
+              Your video is ready to be exported and shared.
+            </Text>
+          </VStack>
+          
+          <HStack spacing={4}>
+            <Button
+              leftIcon={<FaFileExport />}
+              colorScheme="brand"
+              onClick={handleOpenExportDialog}
             >
-              <option value="mp4">MP4</option>
-              <option value="webm">WebM</option>
-              <option value="gif">GIF</option>
-            </Select>
-          </FormControl>
-          
-          <FormControl>
-            <FormLabel>Resolution</FormLabel>
-            <Select
-              value={exportOptions.resolution}
-              onChange={(e) => handleExportOptionChange('resolution', e.target.value)}
-              bg="gray.600"
-            >
-              <option value="1080p">1080p (HD)</option>
-              <option value="720p">720p</option>
-              <option value="480p">480p</option>
-            </Select>
-          </FormControl>
-          
-          <FormControl>
-            <FormLabel>Quality</FormLabel>
-            <Select
-              value={exportOptions.quality}
-              onChange={(e) => handleExportOptionChange('quality', e.target.value)}
-              bg="gray.600"
-            >
-              <option value="high">High (larger file)</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low (smaller file)</option>
-            </Select>
-          </FormControl>
-          
-          <FormControl>
-            <FormLabel>Audio</FormLabel>
-            <Stack direction="row">
-              <Switch
-                isChecked={exportOptions.includeAudio}
-                onChange={(e) => handleExportOptionChange('includeAudio', e.target.checked)}
-                colorScheme="brand"
-              />
-              <Text>Include audio in export</Text>
-            </Stack>
-          </FormControl>
-        </SimpleGrid>
-        
-        <Divider my={6} borderColor="gray.600" />
-        
-        <VStack spacing={2} alignItems="flex-start">
-          <Text fontSize="sm" color="gray.400">
-            Estimated file size: {exportOptions.quality === 'high' ? '45-60 MB' : exportOptions.quality === 'medium' ? '20-30 MB' : '10-15 MB'}
-          </Text>
-          
-          <Text fontSize="sm" color="gray.400">
-            Note: Higher quality and resolution will result in larger file sizes and longer export times.
-          </Text>
-        </VStack>
+              Export & Share
+            </Button>
+            
+            <Menu>
+              <MenuButton as={Button} rightIcon={<FaChevronDown />} variant="outline">
+                Quick Share
+              </MenuButton>
+              <MenuList bg="gray.800" borderColor="gray.700">
+                <MenuItem icon={<FaShare />} onClick={handleOpenExportDialog} bg="gray.800" _hover={{ bg: "gray.700" }}>
+                  Advanced Export Options
+                </MenuItem>
+                <MenuItem icon={<FaDownload />} as="a" href={videoUrl} download bg="gray.800" _hover={{ bg: "gray.700" }}>
+                  Download MP4
+                </MenuItem>
+                <MenuItem icon={<FaShareAlt />} onClick={() => {
+                  // Open export dialog with direct link tab active
+                  onOpen();
+                  // We would set active tab to sharing here
+                }} bg="gray.800" _hover={{ bg: "gray.700" }}>
+                  Share Link
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </HStack>
+        </HStack>
       </Box>
+      
+      {/* Export dialog */}
+      <ExportDialog 
+        isOpen={isOpen} 
+        onClose={onClose} 
+        projectId={projectId}
+        videoUrl={videoUrl}
+      />
     </Box>
-  );
-};
-
-// Helper component for the grid layout
-const SimpleGrid: React.FC<{
-  columns: { base: number; md: number };
-  spacing: number;
-  children: React.ReactNode;
-}> = ({ columns, spacing, children }) => {
-  return (
-    <Grid
-      templateColumns={{
-        base: `repeat(${columns.base}, 1fr)`,
-        md: `repeat(${columns.md}, 1fr)`,
-      }}
-      gap={spacing}
-    >
-      {children}
-    </Grid>
   );
 };
 
