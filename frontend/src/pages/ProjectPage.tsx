@@ -36,6 +36,9 @@ import {
 import { FaArrowLeft, FaSave, FaPlay, FaDownload, FaShare, FaHome } from 'react-icons/fa';
 import { useAppSelector, useAppDispatch } from '../hooks/reduxHooks';
 
+// Import our Style Selection Tab component
+import StyleSelectionTab from '../components/style/StyleSelectionTab';
+
 interface ProjectData {
   id: string;
   title: string;
@@ -43,6 +46,12 @@ interface ProjectData {
   status: 'draft' | 'in-progress' | 'completed';
   createdAt: string;
   updatedAt: string;
+  aspectRatio?: string;
+  styleData?: {
+    srefCode?: string;
+    keywords?: string[];
+    colorPalette?: string[];
+  };
   // Additional fields will be included based on project stage
 }
 
@@ -62,6 +71,7 @@ const ProjectPage: React.FC = () => {
   // Form state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [styleData, setStyleData] = useState<ProjectData['styleData']>({});
   
   useEffect(() => {
     const loadProject = async () => {
@@ -74,9 +84,18 @@ const ProjectPage: React.FC = () => {
           status: 'draft',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          aspectRatio: '16:9',
+          styleData: {
+            keywords: [],
+            colorPalette: [],
+          },
         });
         setTitle('Untitled Project');
         setDescription('');
+        setStyleData({
+          keywords: [],
+          colorPalette: [],
+        });
         setIsLoading(false);
         return;
       }
@@ -95,11 +114,18 @@ const ProjectPage: React.FC = () => {
             status: 'in-progress',
             createdAt: '2025-03-01T12:00:00Z',
             updatedAt: '2025-03-10T14:30:00Z',
+            aspectRatio: '16:9',
+            styleData: {
+              srefCode: 'minimalist-01',
+              keywords: ['Clean', 'Modern', 'Simple'],
+              colorPalette: ['#FFFFFF', '#000000', '#1f8de6'],
+            },
           };
           
           setProject(mockProject);
           setTitle(mockProject.title);
           setDescription(mockProject.description);
+          setStyleData(mockProject.styleData || {});
           setIsLoading(false);
         }, 1000);
       } catch (error) {
@@ -126,6 +152,7 @@ const ProjectPage: React.FC = () => {
         ...project,
         title,
         description,
+        styleData,
         updatedAt: new Date().toISOString(),
       };
       
@@ -166,6 +193,10 @@ const ProjectPage: React.FC = () => {
       });
       setIsLoading(false);
     }
+  };
+  
+  const handleStyleDataChange = (newStyleData: ProjectData['styleData']) => {
+    setStyleData(newStyleData);
   };
   
   const handleTabChange = (index: number) => {
@@ -345,11 +376,15 @@ const ProjectPage: React.FC = () => {
           {/* Style Selection Tab */}
           <TabPanel>
             <Box bg="gray.800" p={6} borderRadius="md">
-              <Heading size="md" mb={4}>Style Selection</Heading>
-              <Text>
-                This section will contain the Style Selection module where users can choose visual styles,
-                color palettes, and keywords to define the aesthetic of their video.
-              </Text>
+              {project && !isNewProject ? (
+                <StyleSelectionTab 
+                  projectId={project.id}
+                  initialStyleData={project.styleData}
+                  onStyleDataChange={handleStyleDataChange}
+                />
+              ) : (
+                <Text>Please create and save the project first to access the Style Selection module.</Text>
+              )}
             </Box>
           </TabPanel>
           
