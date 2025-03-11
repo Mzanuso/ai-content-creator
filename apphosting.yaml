@@ -1,12 +1,12 @@
 app_root: frontend
 buildpacks:
   nodejs:
-    version: "20.x"
-    npm_version: "10.x"
+    version: "18.x"  # Versione stabile di Node.js
+    npm_version: "9.x"  # Versione stabile di npm
   nodejs_install:
-    script: "cd frontend && npm ci --legacy-peer-deps"
+    script: "cd frontend && npm install"  # Usa npm install standard invece di npm ci
   nodejs_build:
-    script: "cd frontend && CI=false npm run build"
+    script: "cd frontend && npm run build"  # Script di build semplificato
 env:
   - variable: FIREBASE_CONFIG
     value: '{"databaseURL":"","projectId":"ai-content-creator-f7d53","storageBucket":"ai-content-creator-f7d53.firebasestorage.app"}'
