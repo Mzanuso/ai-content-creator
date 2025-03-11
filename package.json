@@ -6,8 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare-frontend": "cd frontend && npm install --legacy-peer-deps && npm run build",
+    "prepare-backend": "cd backend && pip install -r requirements.txt",
     "build": "npm run prepare-frontend",
-    "deploy": "firebase deploy"
+    "deploy": "firebase deploy",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:backend": "cd backend && uvicorn app.main:app --reload"
   },
   "repository": {
     "type": "git",
