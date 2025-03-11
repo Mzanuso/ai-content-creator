@@ -49,7 +49,32 @@
   <div class="container">
     <h1>AI Content Creator</h1>
     <p>An AI-powered platform for creating professional video content through a guided creative workflow.</p>
-    <a href="#" class="cta-button">Get Started</a>
+    <a href="/app" class="cta-button">Get Started</a>
   </div>
+
+  <!-- Import the Firebase SDK -->
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyAh6QO0rj3Fipyoc1pJ5UTWeS_S-HLzftM",
+      authDomain: "ai-content-creator-f7d53.firebaseapp.com",
+      projectId: "ai-content-creator-f7d53",
+      storageBucket: "ai-content-creator-f7d53.firebasestorage.app",
+      messagingSenderId: "608058888070",
+      appId: "1:608058888070:web:c9ff5462de964fa84a2607",
+      measurementId: "G-BL3NB5HWQ0"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
 </body>
 </html>
