@@ -6,13 +6,13 @@ import { getAnalytics } from 'firebase/analytics';
 
 // Firebase configuration from the provided configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCT0BFTRljnsrbcT1SxwsWEEyrgca952cg",
-  authDomain: "video-content-creator-4bb16.firebaseapp.com",
-  projectId: "video-content-creator-4bb16",
-  storageBucket: "video-content-creator-4bb16.firebasestorage.app",
-  messagingSenderId: "1050991356651",
-  appId: "1:1050991356651:web:47b42676c06e732b6eecae",
-  measurementId: "G-FYXH1BGLFB"
+  apiKey: "AIzaSyAh6QO0rj3Fipyoc1pJ5UTWeS_S-HLzftM",
+  authDomain: "ai-content-creator-f7d53.firebaseapp.com",
+  projectId: "ai-content-creator-f7d53",
+  storageBucket: "ai-content-creator-f7d53.firebasestorage.app",
+  messagingSenderId: "608058888070",
+  appId: "1:608058888070:web:c9ff5462de964fa84a2607",
+  measurementId: "G-BL3NB5HWQ0"
 };
 
 // Initialize Firebase
