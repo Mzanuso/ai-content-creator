@@ -1,0 +1,30 @@
+{
+  "name": "ai-content-creator",
+  "version": "1.0.0",
+  "description": "AI-powered content creation platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cd frontend && npm install && npm run build",
+    "deploy": "firebase deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mzanuso/ai-content-creator.git"
+  },
+  "keywords": [
+    "ai",
+    "content",
+    "creator",
+    "firebase"
+  ],
+  "author": "Mzanuso",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Mzanuso/ai-content-creator/issues"
+  },
+  "homepage": "https://github.com/Mzanuso/ai-content-creator#readme",
+  "dependencies": {
+    "firebase-tools": "^12.5.2"
+  }
+}
