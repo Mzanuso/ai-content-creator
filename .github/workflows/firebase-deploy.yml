@@ -15,23 +15,32 @@ jobs:
         with:
           node-version: 16
           
+      - name: Show Node version
+        run: node -v && npm -v
+          
       - name: Install root dependencies
         run: npm install
+        
+      - name: Add Firebase Tokens
+        run: |
+          echo "FIREBASE_TOKEN=${{ secrets.FIREBASE_TOKEN }}" >> $GITHUB_ENV
+          echo "FIREBASE_PROJECT=ai-content-creator-f7d53" >> $GITHUB_ENV
+          echo "Building for project $FIREBASE_PROJECT"
           
       - name: Install frontend dependencies
         run: |
           cd frontend
-          npm install --force
+          npm install --legacy-peer-deps
           
       - name: Build frontend
         run: |
           cd frontend
-          CI=false npm run build
+          GENERATE_SOURCEMAP=false CI=false npm run build
           
       - name: Install functions dependencies
         run: |
           cd functions
-          npm install --force
+          npm install
           
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
