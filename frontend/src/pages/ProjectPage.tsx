@@ -35,11 +35,12 @@ import {
 } from '@chakra-ui/react';
 import { FaArrowLeft, FaSave, FaPlay, FaDownload, FaShare, FaHome } from 'react-icons/fa';
 import { useAppSelector, useAppDispatch } from '../hooks/reduxHooks';
-import { Screenplay } from '../features/ai/aiSlice';
+import { Screenplay, Storyboard, GeneratedImage } from '../features/ai/aiSlice';
 
 // Import tab components
 import StyleSelectionTab from '../components/style/StyleSelectionTab';
 import StorytellingTab from '../components/storytelling/StorytellingTab';
+import StoryboardTab from '../components/storyboard/StoryboardTab';
 
 interface ProjectData {
   id: string;
@@ -55,6 +56,8 @@ interface ProjectData {
     colorPalette?: string[];
   };
   screenplay?: Screenplay;
+  storyboard?: Storyboard;
+  storyboardImages?: GeneratedImage[];
   // Additional fields will be included based on project stage
 }
 
@@ -76,6 +79,8 @@ const ProjectPage: React.FC = () => {
   const [description, setDescription] = useState('');
   const [styleData, setStyleData] = useState<ProjectData['styleData']>({});
   const [screenplay, setScreenplay] = useState<Screenplay | null>(null);
+  const [storyboard, setStoryboard] = useState<Storyboard | null>(null);
+  const [storyboardImages, setStoryboardImages] = useState<GeneratedImage[]>([]);
   
   useEffect(() => {
     const loadProject = async () => {
@@ -133,7 +138,23 @@ const ProjectPage: React.FC = () => {
                 { id: '4', text: 'We see quick cuts of the product in different environments or use cases, reinforcing its versatility. Each setting maintains the clean, minimalist aesthetic established earlier.', order: 3 },
                 { id: '5', text: 'The camera pulls back to reveal the full product once more. The brand logo appears alongside the product, followed by a simple, powerful tagline. A call to action is displayed, inviting viewers to learn more or make a purchase.', order: 4 },
               ],
-            }
+            },
+            storyboard: {
+              prompts: [
+                { sectionId: '1', prompt: 'Clean white background, product in center, soft directional lighting casting subtle shadows on contours, minimalist, detailed, professional product photography', shotType: 'close-up', cameraMovement: 'static' },
+                { sectionId: '2', prompt: 'Product shown from multiple angles, rotating slowly, with clean text overlays highlighting features, minimalist style, light background, professional product visualization', shotType: 'medium', cameraMovement: 'orbit' },
+                { sectionId: '3', prompt: 'Hands interacting with product on clean white surface, demonstrating functionality, focus on hands and product, soft lighting from above, professional product demonstration', shotType: 'close-up', cameraMovement: 'static' },
+                { sectionId: '4', prompt: 'Split screen showing product in multiple environments, clean minimal settings, consistent lighting across all scenes, professional lifestyle product photography', shotType: 'medium', cameraMovement: 'static' },
+                { sectionId: '5', prompt: 'Product with logo and tagline on clean white background, professional branding, call to action text visible, minimalist commercial end frame', shotType: 'wide', cameraMovement: 'pull back' },
+              ]
+            },
+            storyboardImages: [
+              { id: '1', url: 'https://via.placeholder.com/800x450?text=Scene+1+Image', prompt: 'Clean white background, product in center...' },
+              { id: '2', url: 'https://via.placeholder.com/800x450?text=Scene+2+Image', prompt: 'Product shown from multiple angles...' },
+              { id: '3', url: 'https://via.placeholder.com/800x450?text=Scene+3+Image', prompt: 'Hands interacting with product...' },
+              { id: '4', url: 'https://via.placeholder.com/800x450?text=Scene+4+Image', prompt: 'Split screen showing product...' },
+              { id: '5', url: 'https://via.placeholder.com/800x450?text=Scene+5+Image', prompt: 'Product with logo and tagline...' },
+            ]
           };
           
           setProject(mockProject);
@@ -141,6 +162,8 @@ const ProjectPage: React.FC = () => {
           setDescription(mockProject.description);
           setStyleData(mockProject.styleData || {});
           setScreenplay(mockProject.screenplay || null);
+          setStoryboard(mockProject.storyboard || null);
+          setStoryboardImages(mockProject.storyboardImages || []);
           setIsLoading(false);
         }, 1000);
       } catch (error) {
@@ -169,6 +192,8 @@ const ProjectPage: React.FC = () => {
         description,
         styleData,
         screenplay,
+        storyboard,
+        storyboardImages,
         updatedAt: new Date().toISOString(),
       };
       
@@ -217,6 +242,14 @@ const ProjectPage: React.FC = () => {
   
   const handleScreenplayChange = (newScreenplay: Screenplay) => {
     setScreenplay(newScreenplay);
+  };
+  
+  const handleStoryboardChange = (newStoryboard: Storyboard) => {
+    setStoryboard(newStoryboard);
+  };
+  
+  const handleStoryboardImagesChange = (newImages: GeneratedImage[]) => {
+    setStoryboardImages(newImages);
   };
   
   const handleTabChange = (index: number) => {
@@ -426,11 +459,18 @@ const ProjectPage: React.FC = () => {
           {/* Storyboard Tab */}
           <TabPanel>
             <Box bg="gray.800" p={6} borderRadius="md">
-              <Heading size="md" mb={4}>Storyboard</Heading>
-              <Text>
-                This section will contain the Storyboard module where users can visualize their screenplay
-                as a sequence of images generated by AI.
-              </Text>
+              {project && !isNewProject ? (
+                <StoryboardTab
+                  projectId={project.id}
+                  initialScreenplay={project.screenplay || null}
+                  initialStoryboard={project.storyboard || null}
+                  initialImages={project.storyboardImages || []}
+                  onStoryboardChange={handleStoryboardChange}
+                  onImagesChange={handleStoryboardImagesChange}
+                />
+              ) : (
+                <Text>Please create and save the project first to access the Storyboard module.</Text>
+              )}
             </Box>
           </TabPanel>
           
