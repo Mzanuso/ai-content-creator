@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.api_v1.endpoints import auth, users, projects, styles, ai, media
+from app.api.api_v1.endpoints import auth, users, projects, styles, ai, media, audio
 
 # Main API router
 api_router = APIRouter()
@@ -12,3 +12,4 @@ api_router.include_router(projects.router, prefix="/projects", tags=["projects"]
 api_router.include_router(styles.router, prefix="/styles", tags=["styles"])
 api_router.include_router(ai.router, prefix="/ai", tags=["ai"])
 api_router.include_router(media.router, prefix="/media", tags=["media"])
+api_router.include_router(audio.router, prefix="/audio", tags=["audio"])
