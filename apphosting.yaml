@@ -9,12 +9,12 @@ buildpacks:
     script: "cd frontend && CI=false npm run build"
 env:
   - variable: FIREBASE_CONFIG
-    value: '{"databaseURL":"","projectId":"video-content-creator-4bb16","storageBucket":"video-content-creator-4bb16.firebasestorage.app"}'
+    value: '{"databaseURL":"","projectId":"ai-content-creator-f7d53","storageBucket":"ai-content-creator-f7d53.firebasestorage.app"}'
     availability:
       - BUILD
       - RUNTIME
   - variable: FIREBASE_WEBAPP_CONFIG
-    value: '{"apiKey":"AIzaSyCT0BFTRljnsrbcT1SxwsWEEyrgca952cg","appId":"1:1050991356651:web:47b42676c06e732b6eecae","authDomain":"video-content-creator-4bb16.firebaseapp.com","databaseURL":"","messagingSenderId":"1050991356651","projectId":"video-content-creator-4bb16","storageBucket":"video-content-creator-4bb16.firebasestorage.app"}'
+    value: '{"apiKey":"AIzaSyCT0BFTRljnsrbcT1SxwsWEEyrgca952cg","appId":"1:1050991356651:web:47b42676c06e732b6eecae","authDomain":"ai-content-creator-f7d53.firebaseapp.com","databaseURL":"","messagingSenderId":"1050991356651","projectId":"ai-content-creator-f7d53","storageBucket":"ai-content-creator-f7d53.firebasestorage.app"}'
     availability:
       - BUILD
   - variable: CI
