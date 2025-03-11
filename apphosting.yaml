@@ -4,9 +4,9 @@ buildpacks:
     version: "16.x"
     npm_version: "8.x"
   nodejs_install:
-    script: "cd frontend && npm install --force"
+    script: "cd frontend && npm install --legacy-peer-deps"
   nodejs_build:
-    script: "cd frontend && CI=false npm run build"
+    script: "cd frontend && export NODE_OPTIONS=--openssl-legacy-provider && CI=false npm run build"
 env:
   - variable: FIREBASE_CONFIG
     value: '{"databaseURL":"","projectId":"ai-content-creator-f7d53","storageBucket":"ai-content-creator-f7d53.firebasestorage.app"}'
@@ -30,10 +30,14 @@ env:
     availability:
       - BUILD
   - variable: NODE_OPTIONS
-    value: '--max-old-space-size=4096'
+    value: '--openssl-legacy-provider --max-old-space-size=4096'
     availability:
       - BUILD
   - variable: GENERATE_SOURCEMAP
     value: 'false'
+    availability:
+      - BUILD
+  - variable: DISABLE_ESLINT_PLUGIN
+    value: 'true'
     availability:
       - BUILD
