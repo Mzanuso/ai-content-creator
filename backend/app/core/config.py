@@ -18,10 +18,15 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "AI Content Creator"
     
     # CORS settings
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "https://localhost:3000", "https://ai-content-creator-video-content-creator-4bb16.web.app", "https://video-content-creator-4bb16.web.app"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000", 
+        "https://localhost:3000", 
+        "https://ai-content-creator-f7d53.web.app", 
+        "https://ai-content-creator-f7d53.firebaseapp.com"
+    ]
     
     # Firebase settings
-    FIREBASE_PROJECT_ID: str = os.getenv("FIREBASE_PROJECT_ID", "video-content-creator-4bb16")
+    FIREBASE_PROJECT_ID: str = os.getenv("FIREBASE_PROJECT_ID", "ai-content-creator-f7d53")
     
     # The service account can be provided as a JSON string in an environment variable
     # or as a path to a file
