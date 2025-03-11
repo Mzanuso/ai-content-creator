@@ -507,7 +507,7 @@ const AudioMixer: React.FC<AudioMixerProps> = ({ audioData, videoUrl, onMixCompl
             opacity={track.isMuted ? 0.3 : 0.8}
             initial={{ height: 0 }}
             animate={{ height: `${value * 40}px` }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.3s }}
             borderRadius="1px"
           />
         ))}
