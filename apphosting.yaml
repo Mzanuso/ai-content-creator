@@ -4,7 +4,7 @@ buildpacks:
     version: "16.x"
     npm_version: "8.x"
   nodejs_install:
-    script: "cd frontend && npm install --legacy-peer-deps"
+    script: "cd frontend && npm install --no-fund --no-audit --legacy-peer-deps"
   nodejs_build:
     script: "cd frontend && export NODE_OPTIONS=--openssl-legacy-provider && CI=false npm run build"
 env:
