@@ -35,9 +35,11 @@ import {
 } from '@chakra-ui/react';
 import { FaArrowLeft, FaSave, FaPlay, FaDownload, FaShare, FaHome } from 'react-icons/fa';
 import { useAppSelector, useAppDispatch } from '../hooks/reduxHooks';
+import { Screenplay } from '../features/ai/aiSlice';
 
-// Import our Style Selection Tab component
+// Import tab components
 import StyleSelectionTab from '../components/style/StyleSelectionTab';
+import StorytellingTab from '../components/storytelling/StorytellingTab';
 
 interface ProjectData {
   id: string;
@@ -52,6 +54,7 @@ interface ProjectData {
     keywords?: string[];
     colorPalette?: string[];
   };
+  screenplay?: Screenplay;
   // Additional fields will be included based on project stage
 }
 
@@ -72,6 +75,7 @@ const ProjectPage: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [styleData, setStyleData] = useState<ProjectData['styleData']>({});
+  const [screenplay, setScreenplay] = useState<Screenplay | null>(null);
   
   useEffect(() => {
     const loadProject = async () => {
@@ -120,12 +124,23 @@ const ProjectPage: React.FC = () => {
               keywords: ['Clean', 'Modern', 'Simple'],
               colorPalette: ['#FFFFFF', '#000000', '#1f8de6'],
             },
+            screenplay: {
+              concept: 'A modern product demonstration that showcases the sleek design and innovative features in a clean, minimalist setting.',
+              sections: [
+                { id: '1', text: 'We open on a clean, white background. Our product slowly comes into view, elegantly lit to highlight its modern design. The lighting creates subtle shadows that emphasize the product\'s contours.', order: 0 },
+                { id: '2', text: 'As the camera slowly orbits the product, we focus on key design elements. Text overlays appear briefly to highlight the most innovative features. Each feature is presented with a simple, elegant animation.', order: 1 },
+                { id: '3', text: 'The product is now shown in use, demonstrating its primary functionality. A pair of hands interacts with the product, showing its intuitive design and ease of use. The movements are deliberate and precise.', order: 2 },
+                { id: '4', text: 'We see quick cuts of the product in different environments or use cases, reinforcing its versatility. Each setting maintains the clean, minimalist aesthetic established earlier.', order: 3 },
+                { id: '5', text: 'The camera pulls back to reveal the full product once more. The brand logo appears alongside the product, followed by a simple, powerful tagline. A call to action is displayed, inviting viewers to learn more or make a purchase.', order: 4 },
+              ],
+            }
           };
           
           setProject(mockProject);
           setTitle(mockProject.title);
           setDescription(mockProject.description);
           setStyleData(mockProject.styleData || {});
+          setScreenplay(mockProject.screenplay || null);
           setIsLoading(false);
         }, 1000);
       } catch (error) {
@@ -153,6 +168,7 @@ const ProjectPage: React.FC = () => {
         title,
         description,
         styleData,
+        screenplay,
         updatedAt: new Date().toISOString(),
       };
       
@@ -197,6 +213,10 @@ const ProjectPage: React.FC = () => {
   
   const handleStyleDataChange = (newStyleData: ProjectData['styleData']) => {
     setStyleData(newStyleData);
+  };
+  
+  const handleScreenplayChange = (newScreenplay: Screenplay) => {
+    setScreenplay(newScreenplay);
   };
   
   const handleTabChange = (index: number) => {
@@ -391,11 +411,15 @@ const ProjectPage: React.FC = () => {
           {/* Storytelling Tab */}
           <TabPanel>
             <Box bg="gray.800" p={6} borderRadius="md">
-              <Heading size="md" mb={4}>Storytelling</Heading>
-              <Text>
-                This section will contain the Storytelling module where users can define their concept
-                and generate a screenplay using AI assistance.
-              </Text>
+              {project && !isNewProject ? (
+                <StorytellingTab 
+                  projectId={project.id}
+                  initialScreenplay={project.screenplay || null}
+                  onScreenplayChange={handleScreenplayChange}
+                />
+              ) : (
+                <Text>Please create and save the project first to access the Storytelling module.</Text>
+              )}
             </Box>
           </TabPanel>
           
